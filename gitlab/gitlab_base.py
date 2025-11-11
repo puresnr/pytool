@@ -27,7 +27,7 @@ def group_pros(git_host, git_token, group_id):
 
     # 递归获取每个子 group 的所有项目
     for subgroup in subgroups:
-        projects.extend(group_pros(subgroup['id'], git_host, git_token))
+        projects.extend(group_pros(git_host, git_token, subgroup['id']))
 
     return projects
 
