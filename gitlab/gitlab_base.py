@@ -12,7 +12,7 @@ def clone_pros(root_path, pros):
     for key, value in pros.items():
         clone_pro(root_path, key, value)
 
-def group_pros(git_host, git_token, group_id):
+def group_pros(git_host, git_token, group_id, filters = None):
     projects = []
 
     # 获取当前 group 的所有项目
@@ -24,10 +24,15 @@ def group_pros(git_host, git_token, group_id):
     response = requests.get(f'{git_host}/api/v4/groups/{group_id}/subgroups', headers={'PRIVATE-TOKEN': git_token})
     response.raise_for_status()
     subgroups = response.json()
+    if filters != None and filters.get('ignore_subgroups') != None:
+        for filter in filters.get('ignore_subgroups'):
+            for subgroup in subgroups:
+                if subgroup['full_path'] == filter:
+                    subgroups.remove(subgroup)
 
     # 递归获取每个子 group 的所有项目
     for subgroup in subgroups:
-        projects.extend(group_pros(git_host, git_token, subgroup['id']))
+        projects.extend(group_pros(git_host, git_token, subgroup['id'], filters))
 
     return projects
 
